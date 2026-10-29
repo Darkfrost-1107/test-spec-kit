@@ -8,6 +8,26 @@
       "source": "bundled",
       "installed_at": "2026-10-29T15:43:40.630462+00:00",
       "updated_at": "2026-10-29T15:43:40.630472+00:00"
+    },
+    "bugfix": {
+      "name": "Guided Bug Fix",
+      "version": "1.0.0",
+      "description": "Runs bug assess \u2192 human review gate \u2192 bug fix \u2192 bug test on a bug report",
+      "source": "catalog",
+      "catalog_name": "default",
+      "url": "https://raw.githubusercontent.com/github/spec-kit/main/workflows/bugfix/workflow.yml",
+      "installed_at": "2026-10-29T16:25:20.455145+00:00",
+      "updated_at": "2026-10-29T16:25:20.455177+00:00"
+    },
+    "assess": {
+      "name": "Idea Assessment Pipeline",
+      "version": "1.0.0",
+      "description": "Runs intake \u2192 research \u2192 define \u2192 shape \u2192 decide with a verdict review gate before a manual /speckit.specify handoff",
+      "source": "catalog",
+      "catalog_name": "default",
+      "url": "https://raw.githubusercontent.com/github/spec-kit/main/workflows/assess/workflow.yml",
+      "installed_at": "2026-10-29T16:25:22.202992+00:00",
+      "updated_at": "2026-10-29T16:25:22.203006+00:00"
     }
   }
 }
