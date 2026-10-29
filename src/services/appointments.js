@@ -2,7 +2,7 @@
 import { tx } from '../db/db.js';
 import { BizError } from '../domain/errors.js';
 import { availableSlots } from '../domain/availability.js';
-import { validateBooking, canModify, applyAttendance } from '../domain/rules.js';
+import { validateBooking, canModify, consecutiveNoShows } from '../domain/rules.js';
 import { addMinutes, localDate, formatLocal } from '../domain/time.js';
 import { isIso } from '../web/validate.js';
 import { enqueue } from './notifications.js';
@@ -183,8 +183,13 @@ export function markAttendance(ctx, { apptId, result }) {
     if (appt.status !== 'active') throw new BizError('NOT_ACTIVE');
     if (appt.starts_at > clock.now().toISOString()) throw new BizError('NOT_STARTED');
     db.prepare('UPDATE appointments SET status = ?, updated_at = ? WHERE id = ?').run(result, clock.now().toISOString(), apptId);
-    const p = db.prepare('SELECT consecutive_no_shows AS n FROM patients WHERE id = ?').get(appt.patient_id);
-    db.prepare('UPDATE patients SET consecutive_no_shows = ? WHERE id = ?').run(applyAttendance(p.n, result), appt.patient_id);
+    const results = db.prepare(
+      `SELECT status FROM appointments
+        WHERE patient_id = ? AND status IN ('attended', 'no_show')
+        ORDER BY starts_at DESC, id DESC`,
+    ).all(appt.patient_id).map((a) => a.status);
+    db.prepare('UPDATE patients SET consecutive_no_shows = ? WHERE id = ?')
+      .run(consecutiveNoShows(results), appt.patient_id);
     return apptId;
   });
 }

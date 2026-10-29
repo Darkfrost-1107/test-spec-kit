@@ -1,3 +1,22 @@
+<!--
+Sync Impact Report
+==================
+Version change: 1.0.0 → 1.1.0
+Bump rationale: MINOR — new principle added (VII); no existing principle removed or redefined.
+
+Modified principles:
+- None (I–VI unchanged)
+
+Added sections:
+- Core Principles / VII. Backward-Compatible HTTP Contracts
+
+Removed sections:
+- None
+
+Deferred TODOs:
+- None
+-->
+
 # TurnoYa Constitution
 
 ## Core Principles
@@ -50,6 +69,15 @@ per appointment and time slot). A delivery failure MUST NOT roll back the bookin
 retriable.
 Rationale: reminders reduce no-shows only if they are neither missed nor duplicated.
 
+### VII. Backward-Compatible HTTP Contracts
+Every existing HTTP route and contract MUST remain compatible: paths, methods, request and
+response shapes, status codes, field names and their semantics MUST NOT break existing consumers.
+Any change that removes or redefines one of these MUST be treated as incompatible and MUST include
+a written justification in the spec or plan, be explicitly approved, and bump the application's
+version to a new MAJOR. Additive, optional changes MAY ship in a compatible release.
+Rationale: clients and integrations depend on the published contract; silent breaks turn small
+changes into outages.
+
 ## Additional Constraints
 
 - v1 scope is the TurnoYa spec; out of scope: payments, medical history, telemedicine, mobile app,
@@ -76,4 +104,4 @@ versioning: MAJOR for removed or redefined principles, MINOR for added principle
 expanded guidance, PATCH for clarifications. Every plan and review MUST verify compliance with the
 principles above; unjustified complexity MUST be rejected.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-10-29
+**Version**: 1.1.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-10-29

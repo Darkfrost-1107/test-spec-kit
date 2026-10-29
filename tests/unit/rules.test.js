@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  hasOverlap, hasMinNotice, canModify, isOnlineBookingLocked, applyAttendance, validateBooking,
+  hasOverlap, hasMinNotice, canModify, isOnlineBookingLocked, consecutiveNoShows, validateBooking,
 } from '../../src/domain/rules.js';
 
 const NOW = new Date('2026-11-02T14:00:00.000Z');
@@ -50,10 +50,11 @@ test('isOnlineBookingLocked: 2 no, 3 sí', () => {
   assert.equal(isOnlineBookingLocked(2), false);
   assert.equal(isOnlineBookingLocked(3), true);
 });
-test('applyAttendance: no_show suma, attended reinicia a 0', () => {
-  assert.equal(applyAttendance(0, 'no_show'), 1);
-  assert.equal(applyAttendance(2, 'no_show'), 3);
-  assert.equal(applyAttendance(2, 'attended'), 0);
+test('consecutiveNoShows: cuenta solo la racha más reciente, de nueva a antigua', () => {
+  assert.equal(consecutiveNoShows([]), 0);
+  assert.equal(consecutiveNoShows(['no_show', 'no_show', 'no_show', 'attended']), 3);
+  assert.equal(consecutiveNoShows(['attended', 'no_show', 'no_show']), 0);
+  assert.equal(consecutiveNoShows(['no_show', 'attended', 'no_show']), 1);
 });
 
 // validateBooking

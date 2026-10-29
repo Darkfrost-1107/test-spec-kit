@@ -33,9 +33,17 @@ export function isOnlineBookingLocked(consecutiveNoShows) {
   return consecutiveNoShows >= NO_SHOW_LOCK;
 }
 
-/** FR-021: una asistencia reinicia el conteo; una inasistencia lo incrementa. */
-export function applyAttendance(consecutiveNoShows, result) {
-  return result === 'attended' ? 0 : consecutiveNoShows + 1;
+/**
+ * FR-021: inasistencias consecutivas según los resultados más recientes.
+ * `results` va de la cita más nueva a la más antigua; una asistencia corta la racha.
+ */
+export function consecutiveNoShows(results) {
+  let count = 0;
+  for (const result of results) {
+    if (result === 'no_show') count += 1;
+    else if (result === 'attended') break;
+  }
+  return count;
 }
 
 /** Citas "activas" del paciente: confirmadas y que aún no ocurrieron. */

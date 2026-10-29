@@ -71,6 +71,30 @@ test('tres inasistencias consecutivas bloquean la reserva en línea; recepción 
   assert.match((await paula.post('/citas', { doctor_id: ids.ana, starts_at: at('2026-11-11', '09:00') })).text, /Cita reservada/);
 });
 
+test('marcar una asistencia antigua después de tres inasistencias no desbloquea al paciente', async () => {
+  const attended = byReception(ids.paula, '2026-11-02', '09:00');
+  const missed = ['2026-11-03', '2026-11-04', '2026-11-05'].map((d) => byReception(ids.paula, d, '09:00'));
+  app.clock.set(at('2026-11-06', '12:00'));
+  for (const id of missed) await recep.post(`/recepcion/citas/${id}/asistencia`, { result: 'no_show' });
+  await recep.post(`/recepcion/citas/${attended}/asistencia`, { result: 'attended' });
+  assert.equal(noShows(ids.paula), 3);
+
+  const paula = await app.client().login('paula@t.test', 'Paciente1234');
+  assert.match((await paula.post('/citas', { doctor_id: ids.ana, starts_at: at('2026-11-10', '09:00') })).text, /bloqueada por inasistencias/);
+});
+
+test('marcar tres inasistencias antiguas después de una asistencia reciente no bloquea al paciente', async () => {
+  const missed = ['2026-11-02', '2026-11-03', '2026-11-04'].map((d) => byReception(ids.paula, d, '09:00'));
+  const attended = byReception(ids.paula, '2026-11-05', '09:00');
+  app.clock.set(at('2026-11-06', '12:00'));
+  await recep.post(`/recepcion/citas/${attended}/asistencia`, { result: 'attended' });
+  for (const id of missed) await recep.post(`/recepcion/citas/${id}/asistencia`, { result: 'no_show' });
+  assert.equal(noShows(ids.paula), 0);
+
+  const paula = await app.client().login('paula@t.test', 'Paciente1234');
+  assert.match((await paula.post('/citas', { doctor_id: ids.ana, starts_at: at('2026-11-10', '09:00') })).text, /Cita reservada/);
+});
+
 test('una cancelación no cuenta como inasistencia ni reinicia el conteo', async () => {
   const a = byReception(ids.paula, '2026-11-04', '09:00');
   const b = byReception(ids.paula, '2026-11-05', '09:00');
